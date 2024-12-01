@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use HasFactory, SoftDeletes;  // Thêm SoftDeletes vào model;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'total_price', 'user_id'
+        'total_price', 'user_id',  'phone', 'address'
     ];
 
     public function user()

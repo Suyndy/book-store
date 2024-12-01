@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, SoftDeletes;  // Thêm SoftDeletes vào model;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'name', 'email', 'password', 'is_active', 'phone', 'address', 'is_staff',
+        'name', 'email', 'password', 'is_active',
+        //  'phone', 'address', 
+         'is_staff',
     ];
 
     protected $hidden = [
@@ -20,12 +23,22 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'id' => 'uuid',
+        // 'id' => 'uuid',
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        // 'password' => 'hashed',
         'is_active' => 'boolean',
         'is_staff' => 'boolean',
     ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 
     public function orders()
     {
