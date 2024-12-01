@@ -24,8 +24,8 @@ class CreateCategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:categories,name', // Tên category là bắt buộc và phải là duy nhất
-            'description' => 'nullable|string', // Mô tả có thể rỗng, nếu có thì phải là chuỗi
+            'name' => 'required|string|max:255|unique:categories,name',
+            'description' => 'nullable|string',
         ];
     }
 }
