@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Http\Requests\CreateCategoryRequest;
 
 class CategoryController extends Controller
 {
-    public function store(Request $request)
+    public function store(CreateCategoryRequest $request)
     {
-        dd($request->all());
-    }
+       $validated = $request->validated();
+
+       $category = Category::create($validated);
+
+       return response()->json($category, 201);
+    } 
 }
