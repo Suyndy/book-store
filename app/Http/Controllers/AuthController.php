@@ -7,59 +7,60 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Http\Requests\Api\Auth\LoginRequest;
+use App\Http\Requests\Api\Auth\RegisterRequest;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function __construct()
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $this->middleware('auth:api', ['only' => ['me', 'logout']]);
+    }
 
+    public function register(RegisterRequest $request)
+    {
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        $token = JWTAuth::fromUser($user);
-
-        return response()->json(['token' => $token], 201);
+        return response()->json(['message' => 'User registered successfully'], 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
-
         $credentials = $request->only('email', 'password');
 
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
+            $user = User::where('email', $credentials['email'])->first();
+            if (!$user || !Hash::check($credentials['password'], $user->password)) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
-            $refreshToken = JWTAuth::refresh(JWTAuth::getToken());
+            $token = JWTAuth::fromUser($user);
+
+            return response()->json([
+                'token' => $token,
+            ]);
 
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            return response()->json(['error' => $e->getMessage()], 500); 
         }
-
-        return response()->json([
-            'token' => $token,
-            'refresh_token' => $refreshToken
-        ]);
     }
 
     public function refresh()
     {
         try {
-            $token = JWTAuth::refresh(JWTAuth::getToken());
-            return response()->json(['token' => $token]);
+            $token = JWTAuth::getToken();
+
+            if (!$token) {
+                return response()->json(['error' => 'Token is required'], 400);
+            }
+
+            $newToken = JWTAuth::refresh($token);
+
+            return response()->json(['token' => $newToken]);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not refresh token'], 500);
         }
