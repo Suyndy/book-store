@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AuthController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,14 +18,19 @@ use App\Http\Controllers\CategoryController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-Route::get('/test', function () {
-    return response()->json(['message' => 'API is working']);
-});
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+Route::middleware('auth:api')->post('refresh', [AuthController::class, 'refresh']);
+Route::middleware('auth:api')->get('me', [AuthController::class, 'me']);
+Route::middleware('auth:api')->post('logout', [AuthController::class, 'logout']);
 
 Route::prefix('books')->group(function () {
     Route::post('/', [BookController::class, 'store']);

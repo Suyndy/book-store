@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->boolean('is_active')->default(false);
-            $table->string('phone')->nullable();
-            $table->text('address')->nullable();
+            // $table->string('phone')->nullable();
+            // $table->text('address')->nullable();
             $table->boolean('is_staff')->default(false);
             $table->timestamps();
             $table->softDeletes(); 

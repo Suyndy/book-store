@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
-    use HasFactory, SoftDeletes;  // Thêm SoftDeletes vào model;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
