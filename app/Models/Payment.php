@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, SoftDeletes;  // Thêm SoftDeletes vào model;
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +16,6 @@ class Payment extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        // 'id',
         'transaction_id',
         'payment_date',
         'payment_method',

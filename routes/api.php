@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\BookController;
-
+use App\Http\Controllers\CategoryController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,5 +30,13 @@ Route::prefix('books')->group(function () {
     Route::get('/', [BookController::class, 'getAll']);
     Route::get('/{id}', [BookController::class, 'getOne']);
     Route::put('/{id}', [BookController::class, 'update']);
-    Route::delete('/{id}', [BookController::class, 'delete']);
+    Route::delete('/{id}', [BookController::class, 'softDelete']);
+});
+
+Route::prefix('categories')->group(function () {
+    Route::post('/', [CategoryController::class, 'store']);
+    Route::get('/', [CategoryController::class, 'getAll']);
+    Route::get('/{id}', [CategoryController::class, 'getOne']);
+    Route::put('/{id}', [CategoryController::class, 'update']);
+    Route::delete('/{id}', [CategoryController::class, 'softDelete']);
 });

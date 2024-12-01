@@ -64,15 +64,17 @@ class BookController extends Controller
         return response()->json($book);
     }
 
-    public function delete($id)
+    public function softDelete($id)
     {
         $book = Book::find($id);
 
         if (!$book) {
-            return response()->json(['message' => 'Book not found'], 404);
+            return response()->json(['message' => 'Category not found'], 404);
         }
 
+        // Xóa mềm category
         $book->delete();
-        return response()->json(['message' => 'Book deleted successfully']);
+
+        return response()->json(['message' => 'Category deleted successfully'], 200);
     }
 }
