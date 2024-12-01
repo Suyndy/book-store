@@ -11,7 +11,8 @@ class OrderDetail extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'id', 'book_id', 'quantity', 'price', 'order_id',
+        // 'id', 
+        'book_id', 'quantity', 'price', 'order_id',
     ];
 
     public function order()

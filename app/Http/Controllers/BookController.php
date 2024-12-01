@@ -3,37 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Http\Requests\StoreBookRequest;
+use App\Http\Requests\UpdateBookRequest;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    public function create(Request $request) 
+    public function store(StoreBookRequest $request) 
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'description' => 'nullable|string',
-            'isbn' => 'nullable|string|max:20',
-            'category_id' => 'required|exists:categories,id',
-            'manufacturer' => 'nullable|string|max:255',
-            'published_at' => 'nullable|date',
-        ]);
+        $result = Book::create($request->validated());
 
-        $book = Book::create($request->all());
-        return response()->json($book, 201);
+        if ($result) {
+            return response()->json($result, 201);
+        }
+        return response()->json('Failed to create book', 500);
     }
+    
 
-    public function getAll(Request $request)
+    public function getAll(Request $request) 
     {
         $query = Book::query();
 
-        if ($request->has('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%')
-                ->orWhere('author', 'like', '%' . $request->search . '%');
+        if ( $request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                ->orWhere('author', 'like', '%' . $search . '%');
+            });
         }
 
-        $books = $query->with('category')->get(); 
+        $books = $query->with('category')->paginate(10);
+
         return response()->json($books);
     }
 
@@ -43,28 +43,22 @@ class BookController extends Controller
         return response()->json($book);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateBookRequest $request, $id)
     {
         $book = Book::findOrFail($id);
 
-        $request->validate([
-            'title' => 'nullable|string|max:255',
-            'author' => 'nullable|string|max:255',
-            'price' => 'nullable|numeric',
-            'description' => 'nullable|string',
-            'isbn' => 'nullable|string|max:20',
-            'category_id' => 'nullable|exists:categories,id',
-            'manufacturer' => 'nullable|string|max:255',
-            'published_at' => 'nullable|date',
-        ]);
-
-        $book->update($request->all());
+        $book->update($request->validated());
         return response()->json($book);
     }
 
     public function delete($id)
     {
-        $book = Book::findOrFail($id);
+        $book = Book::find($id);
+
+        if (!$book) {
+            return response()->json(['message' => 'Book not found'], 404);
+        }
+
         $book->delete();
         return response()->json(['message' => 'Book deleted successfully']);
     }

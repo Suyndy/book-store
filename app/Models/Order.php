@@ -11,7 +11,8 @@ class Order extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'id', 'total_price', 'user_id'
+        // 'id', 
+        'total_price', 'user_id'
     ];
 
     public function user()
