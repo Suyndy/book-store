@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('books', function (Blueprint $table) {
-            $table->id()->primary(); 
+            $table->id(); 
             $table->string('isbn')->unique();
             $table->string('title');
             $table->decimal('price', 8, 2);

@@ -11,7 +11,8 @@ class Category extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'id', 'name', 'description',
+        // 'id', 
+        'name', 'description',
     ];
 
     public function books()
