@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id(); 
             $table->decimal('total_price', 8, 2);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->timestamps(); 
+            $table->timestamps();
+            $table->softDeletes(); 
         });
     }
 

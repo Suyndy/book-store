@@ -20,7 +20,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->boolean('is_staff')->default(false);
-            $table->timestamps(); 
+            $table->timestamps();
+            $table->softDeletes(); 
         });
     }
 
