@@ -32,6 +32,19 @@ class BookController extends Controller
             });
         }
 
+        if ($request->has('category')) {
+            $category = $request->category;
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->where('name', 'like', '%' . $category . '%');
+            });
+        }
+
+        if ($request->has('min_price') && $request->has('max_price')) {
+            $minPrice = $request->min_price;
+            $maxPrice = $request->max_price;
+            $query->whereBetween('price', [$minPrice, $maxPrice]);
+        }
+
         $books = $query->with('category')->paginate(10);
 
         return response()->json($books);
