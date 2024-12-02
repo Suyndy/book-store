@@ -28,6 +28,7 @@ class StoreBookRequest extends FormRequest
             'author' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric'],
             'description' => ['nullable', 'string'],
+            'image' => ['required', 'string'],
             'isbn' => ['nullable', 'string', 'max:20', 'unique:books,isbn'],
             'category_id' => ['required', 'exists:categories,id'],
             'manufacturer' => ['nullable', 'string', 'max:255'],
