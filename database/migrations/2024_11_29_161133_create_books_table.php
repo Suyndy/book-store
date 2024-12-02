@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('manufacturer');
             $table->date('published_at');
             $table->text('description')->nullable();
+            $table->text('image')->nullable();
             $table->timestamps();
             $table->softDeletes(); 
         });
