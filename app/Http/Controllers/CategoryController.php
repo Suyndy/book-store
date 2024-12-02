@@ -3,73 +3,65 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Http\Requests\CreateCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\Api\Category\CreateCategoryRequest;
+use App\Http\Requests\Api\Category\UpdateCategoryRequest;
+use App\Services\CategoryService;
 
 class CategoryController extends Controller
 {
+    protected $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     public function store(CreateCategoryRequest $request)
     {
        $validated = $request->validated();
 
-       $category = Category::create($validated);
+       $category = $this->categoryService->create($validated);
 
        return response()->json($category, 201);
     }
 
     public function getAll()
     {
-        // Lấy tất cả các bản ghi từ bảng 'categories'
-        $categories = Category::all();
+        $category = $this->categoryService->getAll();
 
-        // Trả về dữ liệu dưới dạng JSON
-        return response()->json($categories);
+        return response()->json($category);
     }
 
-    // Phương thức lấy một category theo id (UUID)
     public function getOne($id)
     {
-        // Tìm category theo id
-        $category = Category::find($id);
+        $category = $this->categoryService->getOne($id);
 
-        // Nếu không tìm thấy, trả về lỗi 404
         if (!$category) {
             return response()->json(['message' => 'Category not found'], 404);
         }
 
-        // Trả về thông tin category
         return response()->json($category);
     }
 
-     // Cập nhật category
      public function update($id, UpdateCategoryRequest $request)
      {
-         // Tìm category theo id
-         $category = Category::find($id);
+        $validated = $request->validated();
+        $category = $this->categoryService->update($id, $validated);
  
-         if (!$category) {
-             return response()->json(['message' => 'Category not found'], 404);
-         }
+        if (!$category) {
+            return response()->json(['message' => 'Category not found'], 404);
+        }
  
-         // Validate dữ liệu từ request
-         $validated = $request->validated();
- 
-         // Cập nhật category với dữ liệu mới
-         $category->update($validated);
- 
-         return response()->json($category, 200);
+        return response()->json($category, 200);
      }
 
     public function softDelete($id)
     {
-        $category = Category::find($id);
+        $category = $this->categoryService->softDelete($id);
 
         if (!$category) {
             return response()->json(['message' => 'Category not found'], 404);
         }
-
-        // Xóa mềm category
-        $category->delete();
 
         return response()->json(['message' => 'Category deleted successfully'], 200);
     }
