@@ -7,9 +7,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable implements JWTSubject
-{
+{   
+    use Billable;
     use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [

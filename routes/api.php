@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AuthController;
-use App\Http\Middleware\IsAdmin;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
 
 use Illuminate\Support\Facades\Mail;
-use App\Mail\VerifyEmail;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,11 +39,10 @@ Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('verify-forgot-password', [AuthController::class, 'verifyForgotPassword']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
 Route::middleware(['web'])->get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::middleware('auth:api')->post('checkout', [CheckoutController::class, 'checkout']);
+Route::middleware('auth:api')->post('payment/success', [CheckoutController::class, 'handlePaymentSuccess']);
 
-// Route::middleware('web')->group(function () {
-//     Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
-// });
-// // Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::middleware('auth:api')->get('/orders', [OrderController::class, 'getUserOrders']);
 
 Route::middleware('auth:api')->post('refresh', [AuthController::class, 'refresh']);
 Route::middleware('auth:api')->get('me', [AuthController::class, 'me']);

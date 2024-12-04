@@ -16,6 +16,7 @@ return new class extends Migration
             $table->decimal('total_price', 8, 2);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('phone')->nullable();
+            $table->string('status')->default('pending');
             $table->text('address')->nullable();
             $table->timestamps();
             $table->softDeletes(); 
