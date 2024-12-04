@@ -38,6 +38,12 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('verify-forgot-password', [AuthController::class, 'verifyForgotPassword']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
+Route::middleware(['web'])->get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+// Route::middleware('web')->group(function () {
+//     Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+// });
+// // Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
 Route::middleware('auth:api')->post('refresh', [AuthController::class, 'refresh']);
 Route::middleware('auth:api')->get('me', [AuthController::class, 'me']);

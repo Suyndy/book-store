@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -27,7 +26,7 @@ class AuthController extends Controller
             $result = $this->authService->register($request->all());
             
             return response()->json([
-                'message' => 'User registered successfully',
+                'message' => 'Đăng kí tài khoản thành công. Vui lòng kiểm tra email để xác thực tài khoản.',
                 'user' => $result['user'],
                 'token' => $result['token'],
             ], 201);
@@ -40,7 +39,7 @@ class AuthController extends Controller
     {
         try {
             $this->authService->verifyEmail($request->token, $request->email);
-            return response()->json(['message' => 'Email verified successfully.'], 200);
+            return response()->json(['message' => 'Xác thực email thành công.'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -78,7 +77,7 @@ class AuthController extends Controller
             $token = JWTAuth::getToken();
     
             if (!$token) {
-                return response()->json(['error' => 'Token is required'], 400);
+                return response()->json(['error' => 'Yêu cầu token'], 400);
             }
     
             $newToken = $this->authService->refresh($token);
@@ -90,12 +89,12 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(auth()->user());
+        return response()->json(Auth::user());
     }
 
     public function logout()
     {
-        auth()->logout();
+        Auth::logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -149,7 +148,7 @@ class AuthController extends Controller
 
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     public function handleGoogleCallback()

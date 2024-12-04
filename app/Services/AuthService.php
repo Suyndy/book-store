@@ -30,8 +30,6 @@ class AuthService
 
         // Generate token
         $token = Str::random(128);
-        // dd($token);
-
         $user->verify_token = $token;
         $user->save();
 
@@ -42,7 +40,7 @@ class AuthService
 
     protected function sendVerificationEmail(User $user, $token)
     {
-        $uiUrl = env('UI_URL', 'http://localhost:3000');
+        $uiUrl = env('UI_URL', 'http://localhost:5173');
 
         // Construct the verification link
         $verificationLink = $uiUrl . '/auth/verify-email?token=' . $token . '&email=' . $user->email;
@@ -52,7 +50,7 @@ class AuthService
 
     protected function sendForgotPasswordEmail(User $user, $token)
     {
-        $uiUrl = env('UI_URL', 'http://localhost:3000');
+        $uiUrl = env('UI_URL', 'http://localhost:5173');
 
         // Construct the verification link
         $verificationLink = $uiUrl . '/auth/verify-password?token=' . $token . '&email=' . $user->email;
@@ -66,7 +64,7 @@ class AuthService
             $user = User::where('email', $email)->first();
 
             if (!$user || $user->verify_token !== $token || $user->is_active) {
-                throw new \Exception('Invalid user or email mismatch.');
+                throw new \Exception('Lỗi thông tin xác thực,');
             }
 
             $user->is_active = true;
@@ -74,7 +72,7 @@ class AuthService
 
             return $user;
         } catch (\Exception $e) {
-            throw new \Exception('Error verifying email: ' . $e->getMessage());
+            throw new \Exception('Lỗi gửi email: ' . $e->getMessage());
         }
     }
     
@@ -84,7 +82,7 @@ class AuthService
         $user = User::where('verify_token', $data["token"])->where('email', $data['email'])->first();
 
         if (!$user) {
-            throw new \Exception('Invalid user or email mismatch.');
+            throw new \Exception('Không tìm thấy tài khoản.');
         }
 
         $user->password = Hash::make($data['password']);
@@ -98,7 +96,7 @@ class AuthService
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
-            throw new \Exception('Invalid credentials.');
+            throw new \Exception('Lỗi thông tin xác thực.');
         }
 
         return JWTAuth::fromUser($user);
@@ -109,7 +107,7 @@ class AuthService
         try {
             return JWTAuth::refresh($token);
         } catch (JWTException $e) {
-            throw new \Exception('Invalid token or token expired.');
+            throw new \Exception('Lỗi thông tin xác thực.');
         }
     }
 
@@ -118,7 +116,7 @@ class AuthService
         $user = User::where('email', $email)->first();
 
         if (!$user) {
-            throw new \Exception('User not found.');
+            throw new \Exception('Không tìm thấy tài khoản.');
         }
         $token = Str::random(128);
         $user->verify_token = $token;
@@ -136,7 +134,7 @@ class AuthService
         $user = User::where('email', $email)->first();
 
         if (!$user || $user->verify_token !== $token || !$user->is_active) {
-            throw new \Exception('Invalid user or email mismatch.');
+            throw new \Exception('Không tìm thấy tài khoản.');
         }
 
         return true; // Return true if verification is successful
@@ -147,7 +145,7 @@ class AuthService
         $user = User::where('email', $email)->first();
 
         if (!$user || $user->verify_token !== $token || !$user->is_active) {
-            throw new \Exception('Invalid user or email mismatch.');
+            throw new \Exception('Không tìm thấy tài khoản.');
         }
 
         // Hash the new password and save it

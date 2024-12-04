@@ -18,7 +18,7 @@ use App\Http\Middleware\IsAdmin;
 |
 */
 Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
 Route::get('/', function () {
     return view('welcome');
 });
