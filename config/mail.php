@@ -35,10 +35,6 @@ return [
     */
 
     'mailers' => [
-        'mailgun' => [
-            'transport' => 'mailgun',
-        ],
-        
         'smtp' => [
             'transport' => 'smtp',
             'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
@@ -49,6 +45,10 @@ return [
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],
+        'mailgun' => [
+            'transport' => 'mailgun',
+        ],
+        
 
         'ses' => [
             'transport' => 'ses',

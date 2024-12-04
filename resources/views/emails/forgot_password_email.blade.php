@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification</title>
+    <title>Reset Your Password</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,9 +43,9 @@
             color: #aaaaaa;
             font-size: 12px;
         }
-        .verify-button {
+        .reset-button {
             display: inline-block;
-            background-color: #007bff;
+            background-color: #28a745;
             color: #ffffff !important;
             padding: 10px 20px;
             text-decoration: none;
@@ -53,21 +53,21 @@
             margin-top: 20px;
             font-size: 16px;
         }
-        .verify-button:hover {
-            background-color: #0056b3;
+        .reset-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
     <div class="email-container">
         <div class="email-header">
-            <h1>Verify Your Email</h1>
+            <h1>Reset Your Password</h1>
         </div>
         <div class="email-body">
             <p>Hello,</p>
-            <p>Thank you for signing up. Please verify your email address by clicking the button below:</p>
-            <a href="{{ $link }}" class="verify-button">Verify Email</a>
-            <p>If you did not sign up for this account, you can safely ignore this email.</p>
+            <p>We received a request to reset your password. You can reset it by clicking the button below:</p>
+            <a href="{{ $link }}" class="reset-button">Reset Password</a>
+            <p>If you didn't request a password reset, you can ignore this email. Your password will remain unchanged.</p>
         </div>
         <div class="email-footer">
             <p>&copy; {{ date('Y') }} Your Company. All rights reserved.</p>
