@@ -9,6 +9,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -23,8 +24,39 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         try {
-            $user = $this->authService->register($request->all());
-            return response()->json(['message' => 'User registered successfully'], 201);
+            $result = $this->authService->register($request->all());
+            
+            return response()->json([
+                'message' => 'User registered successfully',
+                'user' => $result['user'],
+                'token' => $result['token'],
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function verify(Request $request)
+    {
+        try {
+            $this->authService->verifyEmail($request->token, $request->email);
+            return response()->json(['message' => 'Email verified successfully.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function setPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:8',
+            'token' => 'required|string',
+        ]);
+
+        try {
+            $token = $this->authService->setPassword($request->all());
+            return response()->json(['token' => $token]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -66,5 +98,81 @@ class AuthController extends Controller
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        try {
+            $this->authService->forgotPassword($request->email);
+            return response()->json([
+                'message' => 'Verification token sent to your email.'
+        ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function verifyForgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required|string',
+        ]);
+
+        try {
+            $this->authService->verifyForgotPassword($request->token, $request->email);
+            return response()->json(['message' => 'Token verified successfully.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:8',
+            'token' => 'required|string',
+        ]);
+
+        try {
+            $token = $this->authService->resetPassword($request->email, $request->password, $request->token);
+            return response()->json(['message' => 'Password reset successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            $token = $this->authService->loginGoogle([
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'password' => $googleUser->id,
+            ]);
+
+            if ($token) {
+                return response()->json([
+                    'message' => 'Login successfully',
+                    'token' => $token,
+                ], 200);
+            }
+
+            return response()->json(['error' => 'Login failed'], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }

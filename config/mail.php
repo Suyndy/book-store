@@ -14,6 +14,7 @@ return [
     */
 
     'default' => env('MAIL_MAILER', 'smtp'),
+    // 'default' => env('MAIL_MAILER', 'mailgun'),
 
     /*
     |--------------------------------------------------------------------------
@@ -44,14 +45,18 @@ return [
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],
+        'mailgun' => [
+            'transport' => 'mailgun',
+        ],
+        
 
         'ses' => [
             'transport' => 'ses',
         ],
 
-        'mailgun' => [
-            'transport' => 'mailgun',
-        ],
+        // 'mailgun' => [
+        //     'transport' => 'mailgun',
+        // ],
 
         'postmark' => [
             'transport' => 'postmark',
