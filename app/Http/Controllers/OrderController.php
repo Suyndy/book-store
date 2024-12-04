@@ -19,11 +19,19 @@ class OrderController extends Controller
         // Lấy user đã đăng nhập
         $user = $request->user();
 
-        // Lấy danh sách các order của user
-        $orders = Order::with('orderDetails.book')
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Kiểm tra nếu user là staff (giả sử có trường 'role' trong bảng 'users')
+        if ($user->is_staff) {
+            // Nếu là staff, lấy tất cả đơn hàng
+            $orders = Order::with('orderDetails.book')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            // Nếu là user bình thường, lấy đơn hàng của user đó
+            $orders = Order::with('orderDetails.book')
+                ->where('user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
 
         return response()->json([
             'status' => 'success',
