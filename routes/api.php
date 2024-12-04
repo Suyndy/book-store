@@ -47,7 +47,7 @@ Route::prefix('books')->group(function () {
     Route::get('/', [BookController::class, 'getAll']);
     Route::get('/{id}', [BookController::class, 'getOne']);
 
-    Route::middleware('admin')->group(function () {
+    Route::middleware(['auth:api', 'admin'])->group(function () {
         Route::post('/', [BookController::class, 'store']);
         Route::put('/{id}', [BookController::class, 'update']);
         Route::delete('/{id}', [BookController::class, 'softDelete']);
@@ -58,7 +58,7 @@ Route::prefix('categories')->group(function () {
     Route::get('/', [CategoryController::class, 'getAll']);
     Route::get('/{id}', [CategoryController::class, 'getOne']);
 
-    Route::middleware('admin')->group(function () {
+    Route::middleware(['auth:api', 'admin'])->group(function () {
         Route::post('/', [CategoryController::class, 'store']);
         Route::put('/{id}', [CategoryController::class, 'update']);
         Route::delete('/{id}', [CategoryController::class, 'softDelete']);

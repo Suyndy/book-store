@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Facades\JWTFactory;
@@ -156,6 +157,27 @@ class AuthService
         $user->save();
 
         return true;
+    }
+
+    public function loginGoogle(array $userData)
+    {
+        $user = User::where('email', $userData['email'])->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $userData['name'],
+                'email' => $userData['email'],
+                'password' => Hash::make($userData['password']),
+                'is_active' => true,
+            ]);
+        }
+
+        Auth::login($user);
+
+        // Generate token
+        $token = JWTAuth::fromUser($user);
+
+        return $token;
     }
 
 }

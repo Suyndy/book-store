@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('title');
             $table->decimal('price', 8, 2);
             $table->string('author');
+            $table->integer('quantity');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->string('manufacturer');
             $table->date('published_at');
             $table->text('description')->nullable();
             $table->text('image')->nullable();

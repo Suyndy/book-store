@@ -9,6 +9,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -146,4 +147,32 @@ class AuthController extends Controller
         }
     }
 
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            $token = $this->authService->loginGoogle([
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'password' => $googleUser->id,
+            ]);
+
+            if ($token) {
+                return response()->json([
+                    'message' => 'Login successfully',
+                    'token' => $token,
+                ], 200);
+            }
+
+            return response()->json(['error' => 'Login failed'], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
 }

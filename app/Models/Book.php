@@ -12,7 +12,7 @@ class Book extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'isbn', 'title', 'price', 'author', 'category_id', 'manufacturer', 'published_at', 'description', 'image'
+        'isbn', 'title', 'price', 'author', 'category_id', 'quantity', 'published_at', 'description', 'image'
     ];
 
     public function category()
