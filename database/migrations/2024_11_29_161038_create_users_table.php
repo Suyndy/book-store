@@ -20,7 +20,7 @@ return new class extends Migration
             // $table->string('phone')->nullable();
             // $table->text('address')->nullable();
             $table->boolean('is_staff')->default(false);
-            $table->string('verify_token')->nullable();
+            $table->text('verify_token')->nullable();
             $table->timestamps();
             $table->softDeletes(); 
         });

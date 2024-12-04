@@ -5,32 +5,18 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
+use Tymon\JWTAuth\Payload;
+use Tymon\JWTAuth\PayloadFactory;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 
 class AuthService
 {
-    public function generateCustomJwtToken($customPayload = [], $expirationMinutes = 60)
-    {
-        // Get the current time
-        $issuedAt = now()->timestamp;
-    
-        // Set the required claims
-        $defaultClaims = [
-            'iat' => $issuedAt, // Issued at
-            'exp' => $issuedAt + ($expirationMinutes * 60), // Expiration time
-            'sub' => 'custom', // Subject (can be any identifier)
-        ];
-    
-        // Merge required claims with the custom payload
-        $payload = array_merge($defaultClaims, $customPayload);
-    // Generate the token
-        $token = JWTAuth::factory()->customClaims($payload)->make();
-    
-        return $token;
-    }
 
-    public function register(array $data): User
+    // public function register(array $data): User
+    public function register(array $data): array
     {
         if (User::where('email', $data['email'])->exists()) {
             throw new \Exception('Email already exists.');
@@ -41,21 +27,85 @@ class AuthService
             'email' => $data['email'],
         ]);
 
-        // $token = $this->generateCustomJwtToken(['userId' -> $user->id], 5); 
+        $payload = [
+            'user_id' => 123,
+            'role' => 'admin'
+        ];
+        
+        // Generate token
+        $token = $this->generateToken($payload);
 
-        dd($user->id);
-        $user->verify_token = $token;
-        $user->save();
+        dd($token);
 
-        // $this->sendSetPasswordEmail($user, $token);
-                
-        return $user;
+        // $verifyToken = $this->generateCustomJwtToken(['user_id' => $user->id], 60);
+        // $user->verify_token = $verifyToken;
+        // $user->save();
+
+        // $this->sendVerificationEmail($user, $verifyToken);
+
+        // return $user;
+        // return [
+        //     'user' => $user,
+        //     'token' => $verifyToken,
+        // ];
     }
 
-    protected function sendSetPasswordEmail(User $user)
+    protected function sendVerificationEmail(User $user, $token)
     {
-        $link = url('/auth/set-password?token=' . $user->reset_password_token);
-        \Mail::to($user->email)->send(new \App\Mail\SetPasswordMail($link));
+        $verificationLink = url('/auth/verify?token=' . $token . '&email=' . $user->email);
+        Mail::to($user->email)->send(new \App\Mail\VerifyEmail($verificationLink));
+    }
+
+    public function verifyEMail($token, $email)
+    {
+        try {
+            $payload = JWTAuth::setToken($token)->getPayload();
+            
+            if (!$payload) {
+                throw new \Exception('Invalid token or malformed token.');
+            }
+    
+            // \Log::info('Token Payload: ', $payload->toArray());
+            if ($payload['sub'] !== $email) {
+                throw new \Exception('Invalid token type.');
+            }
+
+            $user = User::where('email', $email)->first();
+
+            if (!$user || $user->verify_token !== $token) {
+                throw new \Exception('Invalid user or email mismatch.');
+            }
+
+            $user->email_verified_at = now();
+            $user->verify_token = null; // Xóa verify_token sau khi xác minh thành công
+            $user->save();
+
+    
+            return $user;
+        } catch (\Exception $e) {
+            throw new \Exception('Error verifying email: ' . $e->getMessage());
+        }
+    }
+    
+
+    public function setPassword($data)
+    {
+        $payload = JWTAuth::setToken($data['token'])->getPayload();
+
+        if (!$payload || $payload['sub'] !== 'custom') {
+            throw new \Exception('Invalid token');
+        }
+
+        $user = User::where('id', $payload['user_id'])->where('email', $data['email'])->first();
+
+        if (!$user) {
+            throw new \Exception('Invalid user or email mismatch.');
+        }
+
+        $user->password = Hash::make($data['password']);
+        $user->save();
+
+        return JWTAuth::fromUser($user);
     }
 
     public function login(array $credentials): ?string
@@ -77,4 +127,66 @@ class AuthService
             throw new \Exception('Invalid token or token expired.');
         }
     }
+
+    public function forgotPassword(string $email)
+    {
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            throw new \Exception('User not found.');
+        }
+
+        // Generate a token with a 60-minute expiration
+        $token = $this->generateCustomJwtToken(['user_id' => $user->id], 60);
+
+        // Send verification email with token
+        // $this->sendVerificationEmail($user, $token);
+
+        // return true;
+
+        return $token;
+    }
+
+    public function verifyForgotPassword(string $token, string $email)
+    {
+        // Decode the token
+        $payload = JWTAuth::setToken($token)->getPayload();
+
+        if (!$payload || $payload['sub'] !== 'custom') {
+            throw new \Exception('Invalid token');
+        }
+
+        // Retrieve user by token and email
+        $user = User::where('id', $payload['user_id'])->where('email', $email)->first();
+
+        if (!$user) {
+            throw new \Exception('Invalid user or email mismatch.');
+        }
+
+        return true; // Return true if verification is successful
+    }
+
+    public function resetPassword(string $email, string $password, string $token)
+    {
+        // Decode the token
+        $payload = JWTAuth::setToken($token)->getPayload();
+
+        if (!$payload || $payload['sub'] !== 'custom') {
+            throw new \Exception('Invalid token');
+        }
+
+        // Retrieve user by token and email
+        $user = User::where('id', $payload['user_id'])->where('email', $email)->first();
+
+        if (!$user) {
+            throw new \Exception('Invalid user or email mismatch.');
+        }
+
+        // Hash the new password and save it
+        $user->password = Hash::make($password);
+        $user->save();
+
+        return JWTAuth::fromUser($user); // Return a new token after resetting the password
+    }
+
 }
