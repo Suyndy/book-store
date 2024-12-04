@@ -70,7 +70,6 @@ class AuthService
             }
 
             $user->is_active = true;
-            $user->verify_token = null;
             $user->save();
 
             return $user;
