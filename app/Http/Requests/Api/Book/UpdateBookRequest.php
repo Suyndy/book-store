@@ -16,7 +16,7 @@ class UpdateBookRequest extends FormRequest
         return [
             'title' => ['nullable', 'string', 'max:255'],
             'author' => ['nullable', 'string', 'max:255'],
-            'price' => ['nullable', 'numeric'],
+            'price' => ['nullable', 'integer'],
             'quantity' => ['nullable', 'integer'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'string'],

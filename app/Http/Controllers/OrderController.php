@@ -38,4 +38,19 @@ class OrderController extends Controller
             'data' => $orders,
         ]);
     }
+    public function getOrderDetails(Request $request, $id)
+    {
+        // Fetch the order details for the given order_id
+        $user = $request->user();
+
+        $orderDetails = Order::with('orderDetails.book')
+            ->where('id', $id)
+            ->firstOrFail()
+            ->orderDetails;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $orderDetails,
+        ]);
+    }
 }

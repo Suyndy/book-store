@@ -43,6 +43,7 @@ Route::middleware('auth:api')->post('checkout', [CheckoutController::class, 'che
 Route::middleware('auth:api')->post('payment/success', [CheckoutController::class, 'handlePaymentSuccess']);
 
 Route::middleware('auth:api')->get('/orders', [OrderController::class, 'getUserOrders']);
+Route::middleware('auth:api')->get('/order-details/{id}', [OrderController::class, 'getOrderDetails']);
 
 Route::middleware('auth:api')->post('refresh', [AuthController::class, 'refresh']);
 Route::middleware('auth:api')->get('me', [AuthController::class, 'me']);

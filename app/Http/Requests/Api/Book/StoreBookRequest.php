@@ -26,7 +26,7 @@ class StoreBookRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'author' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'numeric'],
+            'price' => ['required', 'integer'],
             'quantity' => ['required', 'integer'],
             'description' => ['nullable', 'string'],
             'image' => ['required', 'string'],
