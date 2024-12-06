@@ -18,7 +18,7 @@ use App\Http\Middleware\IsAdmin;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('api/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 
 Route::get('/', function () {
     return view('welcome');

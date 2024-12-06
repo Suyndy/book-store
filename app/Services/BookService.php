@@ -17,6 +17,8 @@ class BookService
     {
         $query = Book::query();
 
+        $pageSize = $request->has('pageSize') ? $request->pageSize : 5;
+
         // Tìm kiếm theo từ khóa
         if ($request->has('search')) {
             $search = $request->search;
@@ -52,7 +54,9 @@ class BookService
         }
 
         // Trả về dữ liệu phân trang
-        return $query->with('category')->paginate(10);
+        // return $query->with('category')->paginate(($request->has('page') ? ( $request->page) * 5 : 5));
+        // return $query->with('category')->paginate(5);
+        return $query->with('category')->paginate($pageSize);
     }
 
 
